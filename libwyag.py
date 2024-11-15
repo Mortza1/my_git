@@ -104,6 +104,25 @@ def repo_create(path):
     
     return repo
 
+def repo_find(path=".", required=True):
+    path = os.path.realpath(path)
+
+    if os.path.isdir(os.path.join(path, ".git")):
+        return GitRepository(path)
+    
+    parent = os.path.realpath(os.path.join(path, ".."))
+
+    if parent == path:
+        # bottom case
+        # os.path.join('/', '..') == '/'
+        # if parent==path, then path is root
+        if required:
+            raise Exception("No git directory")
+        else:
+            return None
+    
+    return repo_find(parent, required)
+
 
 
 def repo_default_config():
